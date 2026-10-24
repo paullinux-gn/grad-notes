@@ -1,6 +1,6 @@
 # Flatpak build
 
-`build-local.sh` creates `artifacts/Grad-Notes-0.5.7.flatpak` using the
+`build-local.sh` creates `artifacts/Grad-Notes-0.5.8.flatpak` using the
 GNOME 50 runtime, SDK, and matching Rust SDK extension. It builds the web
 interface and GTK app, then packages them with Flatpak's command-line tools.
 It does not install the package.
@@ -12,7 +12,7 @@ is left untouched.
 To install the package after building, open it in GNOME Software or run:
 
 ```sh
-flatpak install --user ./artifacts/Grad-Notes-0.5.7.flatpak
+flatpak install --user ./artifacts/Grad-Notes-0.5.8.flatpak
 ```
 
 The app id is `io.github.paullinux_gn.gradnotes`.

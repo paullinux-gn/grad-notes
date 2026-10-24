@@ -91,7 +91,7 @@ dependencies = [
 
 [[package]]
 name = "grad-notes-backend-core"
-version = "0.5.7"
+version = "0.5.8"
 dependencies = [
  "rusqlite",
  "serde",

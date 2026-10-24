@@ -1436,7 +1436,7 @@ dependencies = [
 
 [[package]]
 name = "grad-notes"
-version = "0.5.7"
+version = "0.5.8"
 dependencies = [
  "rusqlite",
  "serde",

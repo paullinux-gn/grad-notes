@@ -1,7 +1,7 @@
 import { Extension, type Editor } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { fileUrl } from '../api';
-import { library, pickFiles } from '../library.svelte';
+import { isImageFile, library, pickFiles } from '../library.svelte';
 import { ui } from '../ui.svelte';
 import type { FileMeta } from '../types';
 
@@ -13,7 +13,7 @@ export async function pickImageFile(): Promise<File | null> {
 
 /** The node that shows a library file in a page: images inline, others as cards. */
 export function fileNode(f: FileMeta) {
-  return f.mime.startsWith('image/')
+  return isImageFile(f)
     ? { type: 'image', attrs: { src: fileUrl(f.stored), alt: f.name.replace(/\.[^.]+$/, '') } }
     : { type: 'fileBlock', attrs: { id: f.id } };
 }
@@ -29,7 +29,7 @@ export function insertFiles(editor: Editor, files: FileMeta[], pos?: number) {
 /** Adds files from the computer to the library and inserts them. */
 export async function insertUploads(editor: Editor, files: File[], pos?: number) {
   const ok = files.filter((f) => {
-    if (f.type.startsWith('image/') && f.size > MAX_IMAGE_BYTES) {
+    if (isImageFile(f) && f.size > MAX_IMAGE_BYTES) {
       ui.toast('Images must be smaller than 25 MB');
       return false;
     }
@@ -40,7 +40,7 @@ export async function insertUploads(editor: Editor, files: File[], pos?: number)
 
 /** Saves an image into the library and inserts it at `pos`. */
 export async function insertImage(editor: Editor, file: File, pos?: number) {
-  if (file.type.startsWith('image/')) await insertUploads(editor, [file], pos);
+  if (isImageFile(file)) await insertUploads(editor, [file], pos);
 }
 
 /** Handles files pasted or dropped into the editor: images and any other file. */

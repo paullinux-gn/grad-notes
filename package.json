@@ -1,7 +1,7 @@
 {
   "name": "grad-notes",
   "private": true,
-  "version": "0.5.7",
+  "version": "0.5.8",
   "description": "Grad Notes is a local-first notes and study workspace for Linux, built with Rust, GTK 4 and libadwaita",
   "license": "AGPL-3.0-or-later",
   "repository": {

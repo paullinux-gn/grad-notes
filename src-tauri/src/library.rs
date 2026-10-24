@@ -170,7 +170,14 @@ impl Db {
     pub fn import_file(&self, bytes: &[u8], name: &str, mime: &str) -> Result<FileMeta> {
         let name = clean_name(name);
         let stored = format!("{}.{}", uuid::Uuid::new_v4().simple(), extension(&name));
-        let mime = if mime.is_empty() || mime.len() > 100 { mime_for(&stored).to_string() } else { mime.to_string() };
+        let mime = if mime.trim().is_empty()
+            || mime.starts_with("application/octet-stream")
+            || mime.len() > 100
+        {
+            mime_for(&stored).to_string()
+        } else {
+            mime.to_string()
+        };
         std::fs::write(self.files_dir.join(&stored), bytes)?;
         let id = new_id();
         let ts = now();

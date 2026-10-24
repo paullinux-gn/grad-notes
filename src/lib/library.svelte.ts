@@ -41,10 +41,17 @@ export function extOf(name: string): string {
   return i > 0 ? name.slice(i + 1).toLowerCase() : '';
 }
 
+const IMAGE_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'svg', 'bmp', 'ico']);
+
+/** Some desktop file choosers return an empty MIME type; use the filename too. */
+export function isImageFile(file: { name: string; type?: string; mime?: string }): boolean {
+  return (file.type ?? file.mime ?? '').toLowerCase().startsWith('image/') || IMAGE_EXTENSIONS.has(extOf(file.name));
+}
+
 export function fileKind(f: { name: string; mime: string }): FileKind {
   const byExt = EXT_KIND[extOf(f.name)];
   if (byExt) return byExt;
-  if (f.mime.startsWith('image/')) return 'image';
+  if (isImageFile(f)) return 'image';
   if (f.mime.startsWith('audio/')) return 'audio';
   if (f.mime.startsWith('video/')) return 'video';
   if (f.mime.startsWith('text/')) return 'text';

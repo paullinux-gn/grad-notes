@@ -6,7 +6,7 @@
   import Value from './Value.svelte';
   import { databases } from '../databases.svelte';
   import { fileUrl, normalizeFileUrl } from '../api';
-  import { library } from '../library.svelte';
+  import { isImageFile, library } from '../library.svelte';
   import { store } from '../store.svelte';
   import { ui } from '../ui.svelte';
   import type { DbRow, DbView, Property } from '../types';
@@ -54,7 +54,7 @@
     if (!p) return null;
     for (const id of databases.get(row, p) as string[]) {
       const f = library.byId.get(id);
-      if (f && f.mime.startsWith('image/')) return fileUrl(f.stored);
+      if (f && isImageFile(f)) return fileUrl(f.stored);
     }
     return null;
   });
