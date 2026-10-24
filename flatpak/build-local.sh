@@ -4,7 +4,8 @@ set -euo pipefail
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 app_id="io.github.paullinux_gn.gradnotes"
 branch="50"
-output="$root/artifacts/Grad-Notes-0.5.4.flatpak"
+version="$(node -p 'require(process.argv[1]).version' "$root/package.json")"
+output="$root/artifacts/Grad-Notes-$version.flatpak"
 
 for ref in "org.gnome.Sdk//$branch" "org.gnome.Platform//$branch"; do
   flatpak info "$ref" >/dev/null || {
@@ -24,12 +25,15 @@ mkdir -p "$root/artifacts"
 
 npm --prefix "$root" run build
 
-sdk_dir="$(flatpak info --show-location "org.gnome.Sdk//$branch")/files"
-export PKG_CONFIG_SYSROOT_DIR="$sdk_dir"
-export PKG_CONFIG_LIBDIR="$sdk_dir/lib/x86_64-linux-gnu/pkgconfig:$sdk_dir/share/pkgconfig:$sdk_dir/lib/pkgconfig"
-export PKG_CONFIG_ALLOW_CROSS=1
 export CARGO_TARGET_DIR="$root/gtk4/target/flatpak"
-cargo build --release --manifest-path "$root/gtk4/Cargo.toml"
+export CARGO_HOME="$root/gtk4/target/cargo-home"
+mkdir -p "$CARGO_HOME"
+
+# Compile against the matching GNOME SDK instead of trying to link its GTK
+# libraries from the host operating system. Rust comes from the SDK extension.
+flatpak run --devel --share=network --filesystem="$root" --command=sh "org.gnome.Sdk//$branch" -c \
+  'export PATH="/usr/lib/sdk/rust-stable/bin:$PATH"; export CARGO_HOME="$1/gtk4/target/cargo-home"; export CARGO_TARGET_DIR="$1/gtk4/target/flatpak"; cargo build --release --manifest-path "$1/gtk4/Cargo.toml"' \
+  sh "$root"
 
 build_dir="$work/build"
 repo_dir="$work/repo"

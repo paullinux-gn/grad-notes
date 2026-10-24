@@ -31,7 +31,7 @@ jobs:
       - name: Install GNOME SDK and runtime
         run: |
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak install --user --noninteractive flathub org.gnome.Sdk//50 org.gnome.Platform//50
+          flatpak install --user --noninteractive flathub org.gnome.Sdk//50 org.gnome.Platform//50 org.freedesktop.Sdk.Extension.rust-stable//25.08
 
       - run: npm ci
 

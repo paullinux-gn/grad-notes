@@ -4,7 +4,7 @@ A local-first notes and study workspace with nested pages, a block editor, full-
 
 ## Download
 
-Download the Linux Flatpak from the [latest release](https://github.com/paullinux-gn/grad-notes/releases/latest). Open it with GNOME Software, or install it from a terminal with `flatpak install --user ./Grad-Notes-0.5.4.flatpak`. Flatpak uses a separate workspace and does not import existing notes automatically.
+Download the Linux Flatpak from the [latest release](https://github.com/paullinux-gn/grad-notes/releases/latest). Open it with GNOME Software, or install the downloaded package with `flatpak install --user ./Grad-Notes-<version>.flatpak`. Flatpak uses a separate workspace and does not import existing notes automatically.
 
 Grad Notes currently supports Linux desktop environments. The native GTK 4/libadwaita shell is designed for GNOME and runs on Wayland and X11 through GTK/WebKitGTK. Windows and macOS builds are not supported.
 
@@ -128,7 +128,7 @@ npm run bundle:flatpak # same Linux Flatpak package
 
 ### GNOME Flatpak
 
-The GTK 4/libadwaita GNOME version can be packaged with `npm run bundle:flatpak` when the GNOME 50 Flatpak SDK and runtime are installed. The package is written to `artifacts/Grad-Notes-0.5.4.flatpak`; building it does not install it. Install it with `flatpak install --user ./artifacts/Grad-Notes-0.5.4.flatpak`.
+The GTK 4/libadwaita GNOME version can be packaged with `npm run bundle:flatpak` when the GNOME 50 Flatpak SDK, runtime, and matching Rust SDK extension are installed. The package is written to `artifacts/Grad-Notes-<version>.flatpak`; building it does not install it.
 
 Flatpak stores its workspace in its private app-data folder, separate from the native app's existing data. The existing notes are left untouched and are not automatically imported.
 
