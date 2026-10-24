@@ -8,6 +8,10 @@ Download the Linux Flatpak from the [latest release](https://github.com/paullinu
 
 Grad Notes currently supports Linux desktop environments. The native GTK 4/libadwaita shell is designed for GNOME and runs on Wayland and X11 through GTK/WebKitGTK. Windows and macOS builds are not supported.
 
+## Screenshot
+
+![Grad Notes running on GNOME](docs/images/grad-notes-home.png)
+
 ## Why it's light
 
 - **Uses the system WebKitGTK web view** instead of bundling Chromium.
