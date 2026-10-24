@@ -923,7 +923,7 @@ fn update_course_styles(provider: &adw::gtk::CssProvider, courses: &Value) {
             let dark_g = (g as f32 * 0.45).round() as u8;
             let dark_b = (b as f32 * 0.45).round() as u8;
             css.push_str(&format!(
-                " button.flat.{class} {{ background-color: rgba({r}, {g}, {b}, 0.3); color: rgb({dark_r}, {dark_g}, {dark_b}); border-radius: 8px; }} button.flat.{class}:hover {{ background-color: rgba({r}, {g}, {b}, 0.4); }} button.flat.{class}.grad-notes-course-selected {{ background-color: rgba({r}, {g}, {b}, 0.6); color: rgb({dark_r}, {dark_g}, {dark_b}); }}"
+                " button.flat.{class} {{ background-color: rgba({r}, {g}, {b}, 0.25); color: rgb({dark_r}, {dark_g}, {dark_b}); border-radius: 8px; }} button.flat.{class}:hover {{ background-color: rgba({r}, {g}, {b}, 0.4); }} button.flat.{class}.grad-notes-course-selected {{ background-color: rgba({r}, {g}, {b}, 0.6); color: rgb({dark_r}, {dark_g}, {dark_b}); }}"
             ));
         }
     }
