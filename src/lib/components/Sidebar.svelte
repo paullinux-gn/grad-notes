@@ -14,7 +14,7 @@
   import { itemsByDay } from '../calendar.svelte';
   import { clock } from '../clock.svelte';
   import { dueState } from '../dates';
-  import { colorVar } from '../colors';
+  import { colorRgbVar, colorVar, courseColorRgba } from '../colors';
   import { comboKeys, shortcuts, type ShortcutId } from '../shortcuts.svelte';
   import { Progressive, sliceKeeping } from '../progressive.svelte';
   import { ui } from '../ui.svelte';
@@ -193,8 +193,8 @@
           <div class="tag-list">
             {#each planner.courses as c (c.id)}
               {@const open = courseOpen.get(c.id) ?? 0}
-              <div class="nav-row" class:active={store.view === 'course' && store.courseId === c.id}>
-                <button class="nav-main" onclick={() => store.openCourse(c.id)}>
+              <div class="nav-row course-row" class:active={store.view === 'course' && store.courseId === c.id} style:--course-color={colorVar(c.color)} style:--course-rgb={colorRgbVar(c.color)}>
+                <button class="nav-main" style:background-color={courseColorRgba(c.color, 0.5)} onclick={() => store.openCourse(c.id)}>
                   <span class="lead"><span class="dot" style:--dot={colorVar(c.color)}></span></span>
                   <span class="label">{c.name || 'Untitled'}</span>
                 </button>
@@ -498,6 +498,21 @@
     border-radius: var(--r-sm);
     color: var(--text-sidebar);
     transition: background-color var(--dur-fast) var(--ease);
+  }
+  .course-row {
+    color: color-mix(in srgb, var(--course-color) 38%, #000);
+  }
+  .nav-row.course-row .nav-main {
+    color: inherit;
+  }
+  .nav-row.course-row .nav-main:hover {
+    background-color: rgba(var(--course-rgb), 0.68) !important;
+  }
+  .nav-row.course-row.active .nav-main,
+  .nav-row.course-row.active .nav-main:hover {
+    color: var(--text-sidebar);
+    color: color-mix(in srgb, var(--course-color) 38%, #000);
+    background-color: var(--course-color) !important;
   }
   .nav-row:hover {
     background: var(--fill);

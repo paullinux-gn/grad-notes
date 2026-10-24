@@ -28,6 +28,30 @@ export function colorVar(key: string | null | undefined): string {
   return PALETTE.some((c) => c.key === key) ? `var(--c-${key})` : 'var(--c-gray)';
 }
 
+const COURSE_RGB: Record<string, { light: string; dark: string }> = {
+  red: { light: '255, 59, 48', dark: '255, 69, 58' },
+  orange: { light: '255, 149, 0', dark: '255, 159, 10' },
+  yellow: { light: '255, 204, 0', dark: '255, 214, 10' },
+  green: { light: '52, 199, 89', dark: '48, 209, 88' },
+  teal: { light: '48, 176, 199', dark: '64, 200, 224' },
+  blue: { light: '0, 122, 255', dark: '10, 132, 255' },
+  indigo: { light: '88, 86, 214', dark: '94, 92, 230' },
+  purple: { light: '175, 82, 222', dark: '191, 90, 242' },
+  pink: { light: '255, 45, 85', dark: '255, 55, 95' },
+  gray: { light: '142, 142, 147', dark: '152, 152, 157' },
+};
+
+/** A literal RGBA fill, so GTK's WebKit does not need CSS color-mix support. */
+export function courseColorRgba(key: string | null | undefined, alpha: number): string {
+  const values = COURSE_RGB[key ?? ''] ?? COURSE_RGB.gray;
+  const appearance = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+  return `rgba(${values[appearance]}, ${alpha})`;
+}
+
+export function colorRgbVar(key: string | null | undefined): string {
+  return PALETTE.some((c) => c.key === key) ? `var(--c-${key}-rgb)` : 'var(--c-gray-rgb)';
+}
+
 /** A colour not used by any of `taken` yet (cycling once all are used). */
 export function nextColor(taken: string[]): ColorKey {
   const keys = PALETTE.filter((c) => c.key !== 'gray').map((c) => c.key);

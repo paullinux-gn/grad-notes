@@ -130,6 +130,16 @@
   --c-purple: #af52de;
   --c-pink: #ff2d55;
   --c-gray: #8e8e93;
+  --c-red-rgb: 255, 59, 48;
+  --c-orange-rgb: 255, 149, 0;
+  --c-yellow-rgb: 255, 204, 0;
+  --c-green-rgb: 52, 199, 89;
+  --c-teal-rgb: 48, 176, 199;
+  --c-blue-rgb: 0, 122, 255;
+  --c-indigo-rgb: 88, 86, 214;
+  --c-purple-rgb: 175, 82, 222;
+  --c-pink-rgb: 255, 45, 85;
+  --c-gray-rgb: 142, 142, 147;
   --danger: #e5352b;
 
   --selection: color-mix(in srgb, var(--text) 13%, transparent);
@@ -219,6 +229,16 @@
   --c-purple: #bf5af2;
   --c-pink: #ff375f;
   --c-gray: #98989d;
+  --c-red-rgb: 255, 69, 58;
+  --c-orange-rgb: 255, 159, 10;
+  --c-yellow-rgb: 255, 214, 10;
+  --c-green-rgb: 48, 209, 88;
+  --c-teal-rgb: 64, 200, 224;
+  --c-blue-rgb: 10, 132, 255;
+  --c-indigo-rgb: 94, 92, 230;
+  --c-purple-rgb: 191, 90, 242;
+  --c-pink-rgb: 255, 55, 95;
+  --c-gray-rgb: 152, 152, 157;
   --danger: #ff453a;
 
   --selection: color-mix(in srgb, var(--text) 22%, transparent);
