@@ -86,9 +86,17 @@ fn main() {
         let file_base = (!dev_mode).then(|| format!("{}/__tdfile/", app_uri.trim_end_matches('/')));
         prepare_native_bridge(&content_manager, file_base.as_deref());
         let web_context = WebContext::new();
+        // The web view only loads this app's local UI and local attachments.
+        // Keep proxy lookup off: inside Flatpak, GLib otherwise asks the
+        // ProxyResolver portal, which rejects this loopback-only request when
+        // the app has no general network permission.
+        let network_session = webkit6::NetworkSession::default()
+            .expect("WebKit must provide a default network session");
+        network_session.set_proxy_settings(webkit6::NetworkProxyMode::NoProxy, None);
         let web_view = WebView::builder()
             .user_content_manager(&content_manager)
             .web_context(&web_context)
+            .network_session(&network_session)
             .build();
         web_view.connect_load_failed(|_, _, uri, error| {
             eprintln!("Could not load Grad Notes page {uri}: {error}");
