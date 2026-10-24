@@ -160,6 +160,7 @@
   function nativeSidebarSnapshot() {
     return {
       view: store.view,
+      courseId: store.courseId,
       hasOpenNote: store.view === 'page' && !!store.current && store.current.kind !== 'database',
       showStudyAction: store.view === 'cards',
       sections: prefs.sections,

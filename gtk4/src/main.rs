@@ -350,6 +350,7 @@ fn main() {
         let last_header_color = Rc::new(RefCell::new(String::new()));
         let header_color_cache = Rc::clone(&last_header_color);
         let sidebar_web_view = web_view.clone();
+        let sidebar_style_for_refresh = sidebar_style.clone();
         let sidebar_rows_refresh = sidebar_rows.clone();
         let sidebar_home_button = home_button.clone();
         let sidebar_nav_buttons = nav_buttons.clone();
@@ -369,6 +370,7 @@ fn main() {
                 &sidebar_home_button,
                 &sidebar_nav_buttons,
                 &sidebar_snapshot_cache,
+                &sidebar_style_for_refresh,
                 &more_actions_for_refresh,
                 &study_page_for_refresh,
             );
@@ -470,6 +472,7 @@ fn refresh_native_sidebar(
     home_button: &adw::gtk::Button,
     nav_buttons: &[adw::gtk::Button],
     last_snapshot: &Rc<RefCell<String>>,
+    sidebar_style: &adw::gtk::CssProvider,
     more_actions_button: &adw::gtk::Button,
     study_page_button: &adw::gtk::Button,
 ) {
@@ -477,6 +480,7 @@ fn refresh_native_sidebar(
     let home_button = home_button.clone();
     let nav_buttons = nav_buttons.to_vec();
     let last_snapshot = Rc::clone(last_snapshot);
+    let sidebar_style = sidebar_style.clone();
     let more_actions_button = more_actions_button.clone();
     let study_page_button = study_page_button.clone();
     let evaluate_view = web_view.clone();
@@ -498,7 +502,14 @@ fn refresh_native_sidebar(
             };
             more_actions_button.set_visible(snapshot["hasOpenNote"].as_bool() == Some(true));
             study_page_button.set_visible(snapshot["showStudyAction"].as_bool() == Some(true));
-            rebuild_native_sidebar(&rows, &home_button, &nav_buttons, &snapshot, &action_view);
+            rebuild_native_sidebar(
+                &rows,
+                &home_button,
+                &nav_buttons,
+                &snapshot,
+                &action_view,
+                &sidebar_style,
+            );
             *last_snapshot.borrow_mut() = snapshot_text;
         },
     );
@@ -510,7 +521,9 @@ fn rebuild_native_sidebar(
     nav_buttons: &[adw::gtk::Button],
     snapshot: &Value,
     web_view: &WebView,
+    sidebar_style: &adw::gtk::CssProvider,
 ) {
+    update_course_styles(sidebar_style, &snapshot["courses"]);
     while let Some(child) = rows.first_child() {
         rows.remove(&child);
     }
@@ -523,6 +536,8 @@ fn rebuild_native_sidebar(
         &snapshot["favorites"],
         sections,
         web_view,
+        None,
+        false,
     );
     append_sidebar_separator(rows);
     append_sidebar_section(
@@ -532,6 +547,8 @@ fn rebuild_native_sidebar(
         &snapshot["courses"],
         sections,
         web_view,
+        snapshot["courseId"].as_str(),
+        true,
     );
     if let Some(section) = rows.last_child() {
         let add_course = sidebar_button("+ New course", 0);
@@ -551,6 +568,8 @@ fn rebuild_native_sidebar(
         &snapshot["databases"],
         sections,
         web_view,
+        None,
+        false,
     );
     if let Some(section) = rows.last_child() {
         let add_database = sidebar_button("+ New database", 0);
@@ -563,7 +582,16 @@ fn rebuild_native_sidebar(
             }
         }
     }
-    append_sidebar_section(rows, "Tags", "tags", &snapshot["tags"], sections, web_view);
+    append_sidebar_section(
+        rows,
+        "Tags",
+        "tags",
+        &snapshot["tags"],
+        sections,
+        web_view,
+        None,
+        false,
+    );
     append_pages_section(rows, sections, &snapshot["roots"], web_view);
 
     let view = snapshot["view"].as_str().unwrap_or_default();
@@ -601,6 +629,8 @@ fn append_sidebar_section(
     items: &Value,
     sections: &Value,
     web_view: &WebView,
+    active_course_id: Option<&str>,
+    is_course_section: bool,
 ) {
     let expander = adw::gtk::Expander::new(Some(title));
     expander.set_margin_start(8);
@@ -634,6 +664,16 @@ fn append_sidebar_section(
             };
             let color = (key == "courses").then(|| item["color"].as_str()).flatten();
             append_sidebar_item(&content, label, action, id, color, web_view, 0);
+            if is_course_section {
+                if let Some(button) = content.last_child().and_downcast::<adw::gtk::Button>() {
+                    if let Some(color) = color {
+                        button.add_css_class(&course_color_class(color));
+                    }
+                    if active_course_id == Some(id) {
+                        button.add_css_class("grad-notes-course-selected");
+                    }
+                }
+            }
         }
     }
     let action_web_view = web_view.clone();
@@ -844,6 +884,49 @@ fn sidebar_button_with_color(label: &str, depth: i32, color: Option<&str>) -> ad
     button.add_css_class("flat");
     button.add_css_class("grad-notes-sidebar-item");
     button
+}
+
+fn course_color_class(value: &str) -> String {
+    if let Ok(color) = adw::gtk::gdk::RGBA::parse(value) {
+        format!(
+            "grad-notes-course-{:02x}{:02x}{:02x}",
+            (color.red() * 255.0).round() as u8,
+            (color.green() * 255.0).round() as u8,
+            (color.blue() * 255.0).round() as u8
+        )
+    } else {
+        "grad-notes-course-unknown".to_string()
+    }
+}
+
+fn update_course_styles(provider: &adw::gtk::CssProvider, courses: &Value) {
+    let mut css = String::from(
+        ".navigation-sidebar row { padding-top: 0; padding-bottom: 0; min-height: 0; } button.grad-notes-nav-button { min-height: 40px; padding: 6px; } button.grad-notes-home-button { padding: 8px 12px; } button.grad-notes-sidebar-item { padding-top: 4px; padding-bottom: 4px; min-height: 0; } button.grad-notes-tree-disclosure, button.grad-notes-tree-label { padding-left: 0; padding-right: 0; }",
+    );
+    if let Some(items) = courses.as_array() {
+        for item in items {
+            let Some(value) = item["color"].as_str() else {
+                continue;
+            };
+            let Ok(color) = adw::gtk::gdk::RGBA::parse(value) else {
+                continue;
+            };
+            let r = (color.red() * 255.0).round() as u8;
+            let g = (color.green() * 255.0).round() as u8;
+            let b = (color.blue() * 255.0).round() as u8;
+            let class = course_color_class(value);
+            let dark_r = (r as f32 * 0.18).round() as u8;
+            let dark_g = (g as f32 * 0.18).round() as u8;
+            let dark_b = (b as f32 * 0.18).round() as u8;
+            let hover_r = (r as f32 * 0.78).round() as u8;
+            let hover_g = (g as f32 * 0.78).round() as u8;
+            let hover_b = (b as f32 * 0.78).round() as u8;
+            css.push_str(&format!(
+                " button.flat.{class} {{ background-color: rgba({r},{g},{b},0.5); color: rgb({dark_r},{dark_g},{dark_b}); }} button.flat.{class}:hover {{ background-color: rgba({hover_r},{hover_g},{hover_b},0.68); }} button.flat.{class}.grad-notes-course-selected {{ background-color: rgb({r},{g},{b}); color: rgb({dark_r},{dark_g},{dark_b}); }}"
+            ));
+        }
+    }
+    provider.load_from_string(&css);
 }
 
 fn update_native_theme(

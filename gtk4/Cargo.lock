@@ -335,7 +335,7 @@ dependencies = [
 
 [[package]]
 name = "grad-notes-gtk4"
-version = "0.5.9"
+version = "0.5.10"
 dependencies = [
  "grad-notes-backend-core",
  "libadwaita",
