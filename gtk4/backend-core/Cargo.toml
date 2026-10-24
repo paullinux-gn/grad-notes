@@ -1,0 +1,11 @@
+[package]
+name = "grad-notes-backend-core"
+version = "0.5.4"
+edition = "2024"
+publish = false
+
+[dependencies]
+rusqlite = { version = "0.40", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+uuid = { version = "1", features = ["v4"] }

@@ -1,0 +1,41 @@
+[package]
+name = "grad-notes"
+version = "0.5.4"
+description = "Grad Notes - a fast, local-first notes workspace"
+authors = ["Kusule"]
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/paullinux-gn/grad-notes"
+edition = "2021"
+rust-version = "1.80"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-window-state = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-notification = "2"
+# Updates from GitHub releases, and restarting into them.
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+rusqlite = { version = "0.40", features = ["bundled"] }
+uuid = { version = "1", features = ["v4"] }
+
+# Small, fast release binary: the app is mostly I/O bound, so favour size.
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
+
+# WebView2 COM access (versions pinned to match the ones wry uses) so we can
+# ask the webview to trim its memory while the window is minimized.
+[target.'cfg(windows)'.dependencies]
+webview2-com = "0.39.1"
+windows-core = "0.62.2"

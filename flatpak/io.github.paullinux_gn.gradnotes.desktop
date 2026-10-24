@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Grad Notes
+Comment=Notes and study workspace
+Exec=grad-notes
+Icon=io.github.paullinux_gn.gradnotes
+Terminal=false
+Type=Application
+Categories=Education;
+StartupNotify=true
+StartupWMClass=io.github.paullinux_gn.gradnotes

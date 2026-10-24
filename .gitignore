@@ -1,0 +1,8 @@
+node_modules
+dist
+**/target/
+artifacts/Grad-Notes-*.flatpak
+src-tauri/gen
+*.log
+test-results
+playwright-report

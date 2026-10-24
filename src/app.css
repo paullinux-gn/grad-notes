@@ -1,0 +1,2043 @@
+/* =========================================================================
+   Grad Notes design system
+   A grayscale base with an optional accent colour, a label palette for
+   courses and events, a 4px spacing grid, continuous (squircle) corners,
+   Inter with optical sizing, frosted materials and spring motion.
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ fonts */
+
+/* Inter 4 with the optical-size axis: text cut at small sizes, display cut
+   for large titles (the way SF Pro Text/Display split). Latin only. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: block;
+  font-weight: 100 900;
+  src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: block;
+  font-weight: 100 900;
+  src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-ext-opsz-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-opsz-italic.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-ext-opsz-italic.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ----------------------------------------------------------------- tokens */
+
+:root {
+  /* Layout */
+  --titlebar-h: 48px;
+  --page-width: 708px;
+  --page-pad: clamp(48px, 9vw, 112px);
+
+  /* Type */
+  --font-ui: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-ui);
+  --font-serif: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, Cambria, serif;
+  --font-mono: 'Cascadia Mono', 'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace;
+  --font-page: var(--font-sans);
+
+  /* One type scale, whole pixels only. */
+  --fs-caption: 11px;
+  --fs-footnote: 12px;
+  --fs-ui: 13px;
+  --fs-body-ui: 14px;
+  --fs-callout: 15px;
+
+  /* Control heights on a 4px grid: inline actions, small, regular, rows. */
+  --h-xs: 24px;
+  --h-sm: 28px;
+  --h-md: 32px;
+  --h-row: 32px;
+
+  /* Weights. Light-on-dark text renders optically heavier, so dark mode
+     trims each step a little (Inter is variable, so any value works). */
+  --fw-400: 450;
+  --fw-500: 500;
+  --fw-550: 550;
+  --fw-600: 600;
+  --fw-650: 650;
+  --fw-700: 700;
+
+  /* Grayscale. Text follows Apple's label hierarchy. */
+  --bg: #ffffff;
+  --bg-sidebar: #f6f6f7;
+  --bg-elevated: #ffffff;
+  --bg-grouped: #f5f5f7;
+  --material: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+  --material-strong: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+
+  --text: #1d1d1f;
+  --text-2: #6e6e73;
+  --text-3: #808085;
+  --text-4: #c7c7cc;
+  --text-sidebar: #2c2c2e;
+
+  --separator: #e8e8ed;
+  --separator-strong: #d2d2d7;
+  --hairline: rgba(0, 0, 0, 0.08);
+
+  --fill: rgba(0, 0, 0, 0.04);
+  --fill-2: rgba(0, 0, 0, 0.065);
+  --fill-3: rgba(0, 0, 0, 0.1);
+
+  /* Graphite: the accent is the text colour, so light and dark appearances get a
+     matching black-and-white accent for free. */
+  --accent: var(--text);
+  --on-accent: var(--bg);
+  /* Icons and small marks that follow the accent (gray in Graphite). */
+  --tint: var(--text-2);
+  /* The inverted HUD surface for toasts and tooltips; never tinted. */
+  --ink: var(--text);
+  --on-ink: var(--bg);
+  /* Raised controls on grouped backgrounds (small buttons, fields) and the
+     selected segment of a segmented control. */
+  --raised: var(--bg-elevated);
+  --knob: var(--bg-elevated);
+
+  /* Label palette (Apple system colours), for courses, events and accents. */
+  --c-red: #ff3b30;
+  --c-orange: #ff9500;
+  --c-yellow: #ffcc00;
+  --c-green: #34c759;
+  --c-teal: #30b0c7;
+  --c-blue: #007aff;
+  --c-indigo: #5856d6;
+  --c-purple: #af52de;
+  --c-pink: #ff2d55;
+  --c-gray: #8e8e93;
+  --danger: #e5352b;
+
+  --selection: color-mix(in srgb, var(--text) 13%, transparent);
+  --mark: color-mix(in srgb, var(--text) 8%, var(--bg));
+  --code-bg: var(--bg-grouped);
+  --callout-bg: var(--bg-grouped);
+  --scrim: rgba(0, 0, 0, 0.18);
+  --focus: color-mix(in srgb, var(--text) 35%, transparent);
+
+  --shadow-sm: 0 0.5px 1px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-pop: 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 10px 32px -8px rgba(0, 0, 0, 0.2), 0 3px 8px -2px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 28px 70px -14px rgba(0, 0, 0, 0.28), 0 10px 24px -10px rgba(0, 0, 0, 0.12);
+
+  --check-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8.4l2.6 2.6L12 5.4'/%3E%3C/svg%3E");
+  --check-black: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8.4l2.6 2.6L12 5.4'/%3E%3C/svg%3E");
+  --check: var(--check-white);
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3.5 10.5 8 6 12.5'/%3E%3C/svg%3E");
+
+  /* Shape, on a 2px scale. Nested corners are concentric: an inner radius
+     is the outer one minus the padding between them (a 12px popover with
+     4px padding holds 8px rows; an 8px segmented control with 2px padding
+     holds 6px segments). */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --corner: superellipse(1.6);
+
+  /* Motion */
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: linear(0, 0.0074, 0.0292, 0.0647 3.3%, 0.1726 5.7%, 0.4419 10.3%, 0.7032 15.2%, 0.8148, 0.9025 21.1%,
+      0.9648 24.8%, 0.9861, 1.0021 29.6%, 1.0127 32.8%, 1.0177 37%, 1.0162 41.6%, 1.0045 53.1%, 0.9987 64.3%,
+      0.9989 78.1%, 1);
+  --dur-fast: 120ms;
+  --dur: 180ms;
+  --dur-slow: 320ms;
+
+  color-scheme: light;
+}
+
+/* A page's margins follow the pane it's in (split view), not the window. */
+[style*='--pane-w'] {
+  --page-pad: clamp(28px, calc(var(--pane-w) * 0.09), 112px);
+}
+
+:root[data-theme='dark'] {
+  --fw-400: 400;
+  --fw-500: 470;
+  --fw-550: 520;
+  --fw-600: 570;
+  --fw-650: 615;
+  --fw-700: 670;
+
+  --bg: #000000;
+  --bg-sidebar: #0f0f10;
+  --bg-elevated: #1c1c1e;
+  --bg-grouped: #161618;
+  --material: color-mix(in srgb, var(--bg-elevated) 80%, transparent);
+  --material-strong: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+
+  --text: #f5f5f7;
+  --text-2: #a1a1a6;
+  --text-3: #6e6e73;
+  --text-4: #48484a;
+  --text-sidebar: #e5e5ea;
+
+  --separator: #1f1f22;
+  --separator-strong: #38383a;
+  --hairline: rgba(255, 255, 255, 0.1);
+
+  --fill: rgba(255, 255, 255, 0.06);
+  --fill-2: rgba(255, 255, 255, 0.1);
+  --fill-3: rgba(255, 255, 255, 0.15);
+
+  --raised: color-mix(in srgb, var(--text) 14%, var(--bg-elevated));
+  --knob: color-mix(in srgb, var(--text) 22%, var(--bg-elevated));
+
+  --c-red: #ff453a;
+  --c-orange: #ff9f0a;
+  --c-yellow: #ffd60a;
+  --c-green: #30d158;
+  --c-teal: #40c8e0;
+  --c-blue: #0a84ff;
+  --c-indigo: #5e5ce6;
+  --c-purple: #bf5af2;
+  --c-pink: #ff375f;
+  --c-gray: #98989d;
+  --danger: #ff453a;
+
+  --selection: color-mix(in srgb, var(--text) 22%, transparent);
+  --mark: color-mix(in srgb, var(--text) 16%, var(--bg));
+  --scrim: rgba(0, 0, 0, 0.55);
+  --focus: color-mix(in srgb, var(--text) 45%, transparent);
+
+  --shadow-sm: 0 0.5px 1px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 0 0 0.5px rgba(255, 255, 255, 0.14), 0 12px 36px -6px rgba(0, 0, 0, 0.7), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 0 0 0.5px rgba(255, 255, 255, 0.12), 0 32px 80px -12px rgba(0, 0, 0, 0.8);
+
+  --check: var(--check-black);
+
+  color-scheme: dark;
+}
+
+/* Colour themes. Each sets surfaces and text for light and dark; accents,
+   selection, focus rings, materials and raised controls derive from them.
+   "Default" is the neutral gray above. */
+:root[data-palette='paper'] {
+  --bg: #fbf8f3;
+  --bg-sidebar: #f3eee5;
+  --bg-elevated: #fffdf9;
+  --bg-grouped: #f4efe6;
+  --text: #2b2620;
+  --text-2: #6f665b;
+  --text-3: #847a6e;
+  --text-4: #cdc3b4;
+  --text-sidebar: #3a342c;
+  --separator: #e8e1d5;
+  --separator-strong: #d8cebe;
+}
+:root[data-palette='paper'][data-theme='dark'] {
+  --bg: #1a1814;
+  --bg-sidebar: #211e19;
+  --bg-elevated: #2a2620;
+  --bg-grouped: #23201b;
+  --text: #f2ece2;
+  --text-2: #b4ab9d;
+  --text-3: #7e7568;
+  --text-4: #4f483e;
+  --text-sidebar: #e6dfd3;
+  --separator: #302b24;
+  --separator-strong: #453e34;
+}
+:root[data-palette='slate'] {
+  --bg: #f8fafc;
+  --bg-sidebar: #eef2f7;
+  --bg-elevated: #ffffff;
+  --bg-grouped: #eef2f7;
+  --text: #1b2333;
+  --text-2: #5c6a80;
+  --text-3: #717f93;
+  --text-4: #c2cad7;
+  --text-sidebar: #263042;
+  --separator: #dee4ed;
+  --separator-strong: #cad3e0;
+}
+:root[data-palette='slate'][data-theme='dark'] {
+  --bg: #0e131b;
+  --bg-sidebar: #121923;
+  --bg-elevated: #1b2330;
+  --bg-grouped: #161e29;
+  --text: #e7ecf4;
+  --text-2: #9ba8bc;
+  --text-3: #66758c;
+  --text-4: #3d4858;
+  --text-sidebar: #d9e0eb;
+  --separator: #202a38;
+  --separator-strong: #334055;
+}
+:root[data-palette='sage'] {
+  --bg: #f8faf6;
+  --bg-sidebar: #edf2e9;
+  --bg-elevated: #ffffff;
+  --bg-grouped: #edf2e9;
+  --text: #1e291d;
+  --text-2: #5e6e5a;
+  --text-3: #73826e;
+  --text-4: #c3cebd;
+  --text-sidebar: #2a3628;
+  --separator: #dee6d7;
+  --separator-strong: #c9d5bf;
+}
+:root[data-palette='sage'][data-theme='dark'] {
+  --bg: #101510;
+  --bg-sidebar: #141a14;
+  --bg-elevated: #1c241c;
+  --bg-grouped: #182018;
+  --text: #e8efe5;
+  --text-2: #a1af9c;
+  --text-3: #6b7a67;
+  --text-4: #404b3d;
+  --text-sidebar: #dbe4d7;
+  --separator: #222b21;
+  --separator-strong: #344133;
+}
+:root[data-palette='rose'] {
+  --bg: #fdf8f8;
+  --bg-sidebar: #f7eded;
+  --bg-elevated: #ffffff;
+  --bg-grouped: #f7eded;
+  --text: #2c1f22;
+  --text-2: #775f64;
+  --text-3: #8f777c;
+  --text-4: #d7c4c7;
+  --text-sidebar: #3b2b2e;
+  --separator: #eddcde;
+  --separator-strong: #e0c9cc;
+}
+:root[data-palette='rose'][data-theme='dark'] {
+  --bg: #191113;
+  --bg-sidebar: #1f1517;
+  --bg-elevated: #2a1e21;
+  --bg-grouped: #23191b;
+  --text: #f6eaec;
+  --text-2: #baa3a7;
+  --text-3: #816a6f;
+  --text-4: #534248;
+  --text-sidebar: #ecdde0;
+  --separator: #322428;
+  --separator-strong: #4a363b;
+}
+:root[data-palette='dusk'] {
+  --bg: #f9f8fd;
+  --bg-sidebar: #efedf9;
+  --bg-elevated: #ffffff;
+  --bg-grouped: #efedf9;
+  --text: #211e34;
+  --text-2: #67618b;
+  --text-3: #7d779f;
+  --text-4: #cbc7df;
+  --text-sidebar: #2d2944;
+  --separator: #e1ddf2;
+  --separator-strong: #cec8e6;
+}
+:root[data-palette='dusk'][data-theme='dark'] {
+  --bg: #12101c;
+  --bg-sidebar: #171424;
+  --bg-elevated: #211d31;
+  --bg-grouped: #1c192b;
+  --text: #ecebf8;
+  --text-2: #a7a2c5;
+  --text-3: #6f6a8f;
+  --text-4: #46415f;
+  --text-sidebar: #dfddef;
+  --separator: #29243f;
+  --separator-strong: #3d3759;
+}
+
+/* A theme made on the colour wheel: every surface and text colour shares one
+   hue (--th), tinted by --tc (0 = neutral gray, 1 = strong). Lightness steps
+   match the preset themes, so text keeps its contrast whatever the colour. */
+:root[data-palette='custom'] {
+  --bg: oklch(0.982 calc(0.028 * var(--tc)) var(--th));
+  --bg-sidebar: oklch(0.952 calc(0.042 * var(--tc)) var(--th));
+  --bg-elevated: oklch(0.993 calc(0.014 * var(--tc)) var(--th));
+  --bg-grouped: oklch(0.957 calc(0.036 * var(--tc)) var(--th));
+  --text: oklch(0.25 calc(0.045 * var(--tc)) var(--th));
+  --text-2: oklch(0.5 calc(0.05 * var(--tc)) var(--th));
+  --text-3: oklch(0.6 calc(0.045 * var(--tc)) var(--th));
+  --text-4: oklch(0.83 calc(0.035 * var(--tc)) var(--th));
+  --text-sidebar: oklch(0.31 calc(0.045 * var(--tc)) var(--th));
+  --separator: oklch(0.915 calc(0.03 * var(--tc)) var(--th));
+  --separator-strong: oklch(0.855 calc(0.035 * var(--tc)) var(--th));
+}
+:root[data-palette='custom'][data-theme='dark'] {
+  --bg: oklch(0.17 calc(0.028 * var(--tc)) var(--th));
+  --bg-sidebar: oklch(0.2 calc(0.032 * var(--tc)) var(--th));
+  --bg-elevated: oklch(0.26 calc(0.036 * var(--tc)) var(--th));
+  --bg-grouped: oklch(0.22 calc(0.032 * var(--tc)) var(--th));
+  --text: oklch(0.95 calc(0.018 * var(--tc)) var(--th));
+  --text-2: oklch(0.76 calc(0.034 * var(--tc)) var(--th));
+  --text-3: oklch(0.57 calc(0.038 * var(--tc)) var(--th));
+  --text-4: oklch(0.4 calc(0.034 * var(--tc)) var(--th));
+  --text-sidebar: oklch(0.91 calc(0.024 * var(--tc)) var(--th));
+  --separator: oklch(0.26 calc(0.032 * var(--tc)) var(--th));
+  --separator-strong: oklch(0.35 calc(0.036 * var(--tc)) var(--th));
+}
+
+/* Accent colours. Graphite (no attribute) is the original black and white;
+   every other accent tints controls, selection, focus rings and icons. The
+   label colours already switch with the theme, so one rule each is enough. */
+:root[data-accent='red'] { --accent: var(--c-red); }
+:root[data-accent='orange'] { --accent: var(--c-orange); }
+:root[data-accent='yellow'] { --accent: var(--c-yellow); }
+:root[data-accent='green'] { --accent: var(--c-green); }
+:root[data-accent='teal'] { --accent: var(--c-teal); }
+:root[data-accent='blue'] { --accent: var(--c-blue); }
+:root[data-accent='indigo'] { --accent: var(--c-indigo); }
+:root[data-accent='purple'] { --accent: var(--c-purple); }
+:root[data-accent='pink'] { --accent: var(--c-pink); }
+:root[data-accent]:not([data-accent='graphite']) {
+  --on-accent: #ffffff;
+  --check: var(--check-white);
+  --tint: var(--accent);
+  --selection: color-mix(in srgb, var(--accent) 24%, transparent);
+  --focus: color-mix(in srgb, var(--accent) 60%, transparent);
+}
+/* Light accents need dark marks on them to stay legible. */
+:root[data-accent='yellow'],
+:root[data-accent='orange'][data-theme='dark'],
+:root[data-accent='green'][data-theme='dark'],
+:root[data-accent='teal'][data-theme='dark'] {
+  --on-accent: #1d1d1f;
+  --check: var(--check-black);
+}
+
+:root[data-font='serif'] {
+  --font-page: var(--font-serif);
+}
+:root[data-font='mono'] {
+  --font-page: var(--font-mono);
+}
+
+/* Changing the look (look-transition.ts): cross-fade, or for light/dark a
+   circle of the new theme spreading out from the click. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease);
+}
+:root[data-look-change='reveal']::view-transition-old(root),
+:root[data-look-change='reveal']::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+:root[data-look-change='reveal']::view-transition-new(root) {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+    --dur-slow: 0ms;
+  }
+}
+
+/* ------------------------------------------------------------------- base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  /* Continuous (squircle) corners everywhere, like Apple's; opt out with .round. */
+  corner-shape: var(--corner);
+}
+.round,
+.round::before,
+.round::after {
+  corner-shape: round;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-body-ui);
+  font-weight: var(--fw-400);
+  line-height: 1.45;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  height: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  corner-shape: var(--corner);
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-3);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+input:focus-visible,
+textarea:focus-visible,
+[contenteditable]:focus-visible {
+  outline: none;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+img,
+svg {
+  display: block;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--r-xs);
+  corner-shape: var(--corner);
+  background: var(--fill);
+  font-family: var(--font-ui);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-500);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  color: var(--text-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Overlay-style scrollbars: a slim thumb that only shows while hovering. */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border: 4px solid transparent;
+  background-clip: content-box;
+  border-radius: 12px;
+  min-height: 40px;
+}
+:hover::-webkit-scrollbar-thumb {
+  background-color: var(--fill-3);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-4);
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ----------------------------------------------------------------- shared */
+
+/* Frosted material for menus and popovers. */
+.popover {
+  background: var(--material);
+  /* Desaturate what shows through so the glass stays neutral gray. */
+  -webkit-backdrop-filter: blur(28px) saturate(0.2);
+  backdrop-filter: blur(28px) saturate(0.2);
+  border-radius: var(--r-lg);
+  corner-shape: var(--corner);
+  box-shadow: var(--shadow-pop);
+}
+
+.icon-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--h-sm);
+  height: var(--h-sm);
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.icon-btn:hover:not(:disabled) {
+  background: var(--fill);
+  color: var(--text);
+}
+.icon-btn:active:not(:disabled) {
+  background: var(--fill-2);
+}
+.icon-btn:disabled {
+  color: var(--text-4);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--h-md);
+  min-width: 80px;
+  padding: 0 16px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-body-ui);
+  font-weight: var(--fw-500);
+  color: var(--text);
+  background: var(--fill-2);
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    opacity var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.btn > .icon {
+  color: inherit;
+  stroke: currentColor;
+}
+.btn:hover {
+  background: var(--fill-3);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.btn.primary:hover {
+  opacity: 0.86;
+}
+
+.btn.small {
+  height: var(--h-sm);
+  min-width: 0;
+  padding: 0 12px;
+  font-size: var(--fs-ui);
+}
+/* A raised button for grouped backgrounds (lists in sheets). */
+.btn.raised {
+  background: var(--raised);
+  box-shadow:
+    0 0 0 0.5px var(--hairline),
+    var(--shadow-sm);
+}
+.btn.raised:hover {
+  background: var(--raised);
+  opacity: 0.86;
+}
+.btn.destructive {
+  color: var(--danger);
+}
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------- sheets (modals)
+   Settings, Trash, assignment and event sheets and file previews all share
+   one header, one 24px gutter and one footer. */
+
+.modal-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 16px 0 24px;
+}
+.modal-head h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 17px;
+  font-weight: var(--fw-650);
+  letter-spacing: -0.016em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 24px 24px;
+}
+/* Content softly fades under the sheet edge instead of being cut. */
+.modal-body.fade {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+}
+/* WebKitGTK can flicker while compositing an animated modal over a masked
+   scrolling surface. Keep GTK dialogs static and let the content scroll cleanly. */
+:root.grad-notes-gtk .backdrop {
+  animation: none !important;
+}
+:root.grad-notes-gtk .modal-body.fade {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+/* GTK/WebKitGTK: keep every app animation static, not just modal and welcome
+   transitions. This also covers CSS animations in editors, menus and views. */
+:root.grad-notes-gtk *,
+:root.grad-notes-gtk *::before,
+:root.grad-notes-gtk *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+.modal-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 0 24px;
+  box-shadow: inset 0 1px 0 var(--hairline);
+  font-size: var(--fs-footnote);
+  color: var(--text-3);
+}
+.modal-foot .actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* --------------------------------------------- inset grouped lists */
+
+/* Every section heading is exactly 24px tall, with or without a button in
+   it, so headings and the lists under them line up across columns. */
+.group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--h-xs);
+  margin: 24px 4px 8px;
+  font-size: var(--fs-ui);
+  line-height: 16px;
+  font-weight: var(--fw-600);
+  color: var(--text-2);
+}
+/* 28px buttons overhang the 24px line evenly instead of stretching it. */
+.group-title > .btn {
+  margin: -2px 0;
+}
+.group-title:first-child {
+  margin-top: 4px;
+}
+.group {
+  background: var(--bg-grouped);
+  border-radius: var(--r-md);
+}
+.group-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  padding: 8px 16px;
+}
+/* Hairline separators inset from the leading edge, like macOS lists. */
+.group-row + .group-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  height: 1px;
+  background: var(--hairline);
+}
+.group-row.compact {
+  min-height: 40px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.group-row.tall {
+  min-height: 72px;
+}
+.group-row.stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.row-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: var(--fs-body-ui);
+  font-weight: var(--fw-500);
+  color: var(--text);
+}
+.row-label small {
+  font-size: var(--fs-footnote);
+  font-weight: var(--fw-400);
+  color: var(--text-3);
+}
+.group-note {
+  margin: 8px 4px 0;
+  font-size: var(--fs-footnote);
+  line-height: 1.45;
+  color: var(--text-3);
+}
+
+/* --------------------------------------------------- fields and chips */
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--h-md);
+  min-width: 0;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--fill);
+  color: var(--text);
+  font-size: var(--fs-body-ui);
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.field:hover {
+  background: var(--fill-2);
+}
+.field:focus-within,
+.field:focus {
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 1.5px var(--focus);
+}
+.group .field {
+  background: var(--raised);
+  box-shadow: 0 0 0 0.5px var(--hairline);
+}
+.group .field:focus-within,
+.group .field:focus {
+  box-shadow: 0 0 0 1.5px var(--focus);
+}
+/* Sliders: a thin track (its colour can be set with --track) and a raised knob. */
+.range {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--track, var(--fill-3));
+  box-shadow: inset 0 0 0 0.5px var(--hairline);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.2),
+    0 1px 4px rgba(0, 0, 0, 0.25);
+}
+.range:focus-visible {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 3px var(--focus),
+    0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Number fields are typed into, not nudged: no spinner arrows. */
+.field input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.field input[type='number']::-webkit-inner-spin-button,
+.field input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.field input,
+.field select {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-size: inherit;
+  color: inherit;
+}
+textarea.field {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 72px;
+  padding: 8px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+/* Native date and time pickers, quieted down. */
+input[type='date'],
+input[type='time'] {
+  font-variant-numeric: tabular-nums;
+}
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='time']::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+  cursor: default;
+}
+:root[data-theme='dark'] input[type='date']::-webkit-calendar-picker-indicator,
+:root[data-theme='dark'] input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* A coloured dot for courses, events and palette swatches. */
+.dot {
+  flex: none;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--dot, var(--c-gray));
+}
+
+/* Pills for filters and quick choices. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--h-sm);
+  padding: 0 12px;
+  border-radius: 14px;
+  corner-shape: round;
+  background: var(--fill);
+  font-size: var(--fs-ui);
+  font-weight: var(--fw-500);
+  color: var(--text-2);
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.chip:hover {
+  background: var(--fill-2);
+  color: var(--text);
+}
+.chip.on {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.chip.on .dot {
+  box-shadow: 0 0 0 1.5px var(--on-accent);
+}
+
+/* Small uppercase-free section label used in lists and popovers. */
+.eyebrow {
+  font-size: var(--fs-caption);
+  line-height: 16px;
+  font-weight: var(--fw-600);
+  letter-spacing: 0.01em;
+  color: var(--text-3);
+}
+
+/* ------------------------------------------------------------ app views
+   Assignments, Calendar and Files share the page's gutters and a large
+   title, so moving between them and pages feels like one place. */
+
+.view {
+  width: 100%;
+  max-width: calc(1040px + 2 * var(--page-pad));
+  margin: 0 auto;
+  padding: 48px var(--page-pad) 72px;
+}
+.view.wide {
+  max-width: none;
+}
+.view-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 24px;
+}
+.view-title {
+  margin: 0;
+  white-space: nowrap;
+  font-size: 32px;
+  font-weight: var(--fw-700);
+  line-height: 40px;
+  letter-spacing: -0.026em;
+}
+.view-sub {
+  margin: 4px 0 0;
+  font-size: var(--fs-callout);
+  line-height: 20px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.view-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 2px;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.toolbar .spacer {
+  flex: 1;
+}
+
+/* ================================================================== editor */
+
+.editor-host {
+  position: relative;
+  /* A wide gutter on the left so the block handle stays inside the hover area. */
+  margin: 0 -48px 0 -96px;
+  padding: 0 48px 0 96px;
+}
+
+/* Text size (Settings): the page text and title; headings, code and lists
+   are sized from it. */
+:root {
+  --page-fs: 16px;
+  --title-fs: 40px;
+}
+:root[data-text-size='small'] {
+  --page-fs: 15px;
+  --title-fs: 34px;
+}
+:root[data-text-size='large'] {
+  --page-fs: 18px;
+  --title-fs: 46px;
+}
+:root[data-text-size='xlarge'] {
+  --page-fs: 20px;
+  --title-fs: 52px;
+}
+.prose {
+  font-family: var(--font-page);
+  font-size: var(--page-fs);
+  font-weight: 400;
+  line-height: 1.625;
+  letter-spacing: -0.006em;
+  color: var(--text);
+  caret-color: var(--text);
+  outline: none;
+  min-height: 2em;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+  font-feature-settings: 'calt' 1, 'case' 0;
+}
+/* Keep editable ProseMirror blocks fully rendered. content-visibility:auto
+   can cause WebKitGTK to hide or drop text while editing block nodes. */
+:root[data-font='serif'] .prose {
+  font-size: calc(var(--page-fs) + 1px);
+  letter-spacing: 0;
+}
+:root[data-font='mono'] .prose {
+  font-size: calc(var(--page-fs) - 1px);
+  letter-spacing: 0;
+}
+
+/* Vertical rhythm: every block gets the same 2px breathing room; headings
+   add space above so sections read as groups. */
+.prose > * {
+  margin: 0;
+}
+.prose p {
+  margin: 0;
+  padding: 3px 0;
+}
+.prose h1,
+.prose h2,
+.prose h3 {
+  margin: 0;
+  padding: 3px 0;
+  font-weight: var(--fw-650);
+  text-wrap: balance;
+}
+.prose h1 {
+  font-size: 1.75em;
+  line-height: 1.25;
+  letter-spacing: -0.022em;
+  margin-top: 1.2em;
+  margin-bottom: 0.1em;
+}
+.prose h2 {
+  font-size: 1.375em;
+  line-height: 1.3;
+  letter-spacing: -0.018em;
+  margin-top: 1em;
+  margin-bottom: 0.05em;
+}
+.prose h3 {
+  font-size: 1.125em;
+  line-height: 1.4;
+  letter-spacing: -0.012em;
+  margin-top: 0.8em;
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose strong {
+  font-weight: var(--fw-650);
+}
+.prose em {
+  font-style: italic;
+}
+.prose s {
+  text-decoration-color: var(--text-3);
+}
+.prose u {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.prose a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--text-4);
+  text-underline-offset: 0.22em;
+  cursor: text;
+  transition: text-decoration-color var(--dur-fast) var(--ease);
+}
+.prose a:hover {
+  text-decoration-color: var(--text);
+}
+
+.prose mark {
+  background: var(--mark);
+  color: inherit;
+  border-radius: 4px;
+  padding: 0.1em 0.2em;
+  margin: 0 -0.05em;
+  box-decoration-break: clone;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  letter-spacing: 0;
+  background: var(--fill-2);
+  border-radius: 5px;
+  corner-shape: var(--corner);
+  padding: 0.18em 0.38em;
+  box-decoration-break: clone;
+}
+
+.prose pre {
+  margin: 6px 0;
+  padding: 16px 20px;
+  background: var(--code-bg);
+  border-radius: var(--r-md);
+  corner-shape: var(--corner);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  line-height: 1.6;
+  letter-spacing: 0;
+  overflow-x: auto;
+  tab-size: 2;
+}
+.prose pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+.prose blockquote {
+  position: relative;
+  margin: 4px 0;
+  padding: 0 0 0 18px;
+}
+.prose blockquote::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--text);
+}
+
+.prose hr {
+  border: none;
+  margin: 0;
+  padding: 14px 0;
+  cursor: default;
+}
+.prose hr::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--separator-strong);
+}
+
+/* Lists: bullets drawn to sit on the x-height of the first line. */
+/* Inter sits slightly low in its line box: the optical centre of a line (the
+   middle of the x-height) is 0.094em below the box centre. Markers that sit
+   beside text are offset by this so they line up with the letters. */
+.prose {
+  --optical: 0.094em;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0;
+  padding: 0 0 0 1.625em;
+}
+.prose ol {
+  list-style-type: decimal;
+}
+.prose li > p {
+  padding: 1px 0;
+}
+.prose ul:not([data-type='taskList']) {
+  list-style: none;
+}
+.prose ul:not([data-type='taskList']) > li {
+  position: relative;
+}
+.prose ul:not([data-type='taskList']) > li::before {
+  content: '';
+  position: absolute;
+  left: -1em;
+  top: calc(1px + 0.8125em + var(--optical) - 2.5px);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  corner-shape: round;
+  background: currentColor;
+}
+.prose ul:not([data-type='taskList']) ul > li::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.25px currentColor;
+}
+.prose ul:not([data-type='taskList']) ul ul > li::before {
+  border-radius: 1px;
+  background: currentColor;
+  box-shadow: none;
+  width: 4.5px;
+  height: 4.5px;
+}
+.prose ol > li::marker {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+.prose ol ol {
+  list-style-type: lower-alpha;
+}
+.prose ol ol ol {
+  list-style-type: lower-roman;
+}
+
+/* To-do lists */
+.prose ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0;
+}
+.prose ul[data-type='taskList'] ul[data-type='taskList'] {
+  padding-left: 26px;
+}
+.prose ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.prose ul[data-type='taskList'] li > label {
+  flex: none;
+  display: block;
+  padding-top: calc(1px + 0.8125em + var(--optical) - 8px);
+  user-select: none;
+}
+.prose ul[data-type='taskList'] li > div > p {
+  padding: 1px 0;
+}
+.prose ul[data-type='taskList'] li > div {
+  flex: 1;
+  min-width: 0;
+}
+.prose ul[data-type='taskList'] input[type='checkbox'] {
+  appearance: none;
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border-radius: 4px;
+  corner-shape: var(--corner);
+  box-shadow: inset 0 0 0 1.5px var(--text-3);
+  background: transparent;
+  cursor: default;
+  transition:
+    background-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.prose ul[data-type='taskList'] input[type='checkbox']:hover {
+  box-shadow: inset 0 0 0 1.5px var(--text-2);
+}
+.prose ul[data-type='taskList'] input[type='checkbox']:active {
+  transform: scale(0.9);
+}
+.prose ul[data-type='taskList'] input[type='checkbox']:checked {
+  background: var(--accent) var(--check) center / 14px no-repeat;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+  animation: check-pop var(--dur-slow) var(--spring);
+}
+@keyframes check-pop {
+  from {
+    transform: scale(0.82);
+  }
+}
+.prose ul[data-type='taskList'] li[data-checked='true'] > div > p {
+  color: var(--text-3);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-4);
+  transition: color var(--dur) var(--ease);
+}
+
+/* Toggles */
+.prose .toggle {
+  display: flex;
+  align-items: flex-start;
+  /* Body text lands on the same 26px indent as list and to-do text. */
+  gap: 8px;
+  margin: 0;
+}
+.prose .toggle > button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin: calc(3px + 0.8125em + var(--optical) - 11px) 0 0 -4px;
+  border-radius: var(--r-xs);
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.prose .toggle > button:hover {
+  background: var(--fill);
+}
+.prose .toggle > button::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: var(--text-2);
+  -webkit-mask: var(--chevron) center / contain no-repeat;
+  mask: var(--chevron) center / contain no-repeat;
+  transition: transform var(--dur) var(--ease-out);
+}
+.prose .toggle.is-open > button::before {
+  transform: rotate(90deg);
+}
+.prose .toggle > div {
+  flex: 1;
+  min-width: 0;
+}
+.prose .toggle summary {
+  display: block;
+  list-style: none;
+  padding: 3px 0;
+  font-weight: var(--fw-550);
+}
+.prose .toggle summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Flashcards: front and back side by side, stacked when narrow. */
+.prose .flashcard {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  margin: 6px 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  corner-shape: var(--corner);
+  overflow: hidden;
+  background: var(--bg);
+}
+.prose .flashcard + .flashcard {
+  margin-top: -2px;
+}
+.prose .fc-side {
+  position: relative;
+  min-height: 1.625em;
+  padding: 26px 14px 10px;
+}
+.prose .fc-side::before {
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: var(--fw-600);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  pointer-events: none;
+}
+.prose .fc-front {
+  font-weight: var(--fw-600);
+  background: var(--callout-bg);
+}
+.prose .fc-front::before {
+  content: 'Front';
+}
+.prose .fc-back {
+  box-shadow: inset 1px 0 0 var(--hairline);
+}
+.prose .fc-back::before {
+  content: 'Back';
+}
+/* Front over back when the pane is narrow (pane-size.ts). */
+[data-below-560] .prose .flashcard {
+  grid-template-columns: minmax(0, 1fr);
+}
+[data-below-560] .prose .fc-back {
+  box-shadow: inset 0 1px 0 var(--hairline);
+}
+
+/* Callouts */
+.prose .callout {
+  display: flex;
+  gap: 10px;
+  margin: 6px 0;
+  padding: 14px 18px 14px 14px;
+  background: var(--callout-bg);
+  border-radius: var(--r-md);
+  corner-shape: var(--corner);
+}
+ /* Math: inline formulas and display blocks (KaTeX). */
+.prose .math-inline {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0 2px;
+  margin: 0 1px;
+  border-radius: var(--r-xs);
+  vertical-align: baseline;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.prose .math-inline:hover,
+.prose .math-inline.editing {
+  background: var(--fill);
+}
+.prose .math-inline.ProseMirror-selectednode,
+.prose .math-block.ProseMirror-selectednode > .math-out {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  outline: none;
+}
+.prose .math-inline .katex {
+  font-size: 1.08em;
+}
+.prose .math-out[data-pending],
+.prose .math-out.math-empty {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--text-3);
+}
+.prose .math-inline .math-empty::before {
+  content: '√';
+  margin-right: 4px;
+  font-family: var(--font-ui);
+}
+.prose .math-block {
+  margin: 6px 0;
+  border-radius: var(--r-md);
+}
+.prose .math-block > .math-out {
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.prose .math-block > .math-out:hover,
+.prose .math-block.editing > .math-out {
+  background: var(--fill);
+}
+.prose .math-block > .math-out.math-empty {
+  padding: 14px 12px;
+  background: var(--fill);
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: var(--fs-ui);
+}
+.prose .math-block .katex-display {
+  margin: 0;
+}
+.prose .math-host {
+  margin: 6px 0 2px;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: var(--bg-elevated);
+  box-shadow:
+    0 0 0 1px var(--separator),
+    var(--shadow-sm, 0 1px 3px rgb(0 0 0 / 0.06));
+  cursor: auto;
+}
+.math-pop {
+  position: fixed;
+  z-index: 96;
+  width: 400px;
+  max-width: calc(100vw - 16px);
+  padding: 10px;
+}
+
+/* The pill that follows the pointer while a page is dragged (pageDragImage). */
+.drag-chip {
+  position: fixed;
+  top: -200px;
+  left: -400px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 260px;
+  height: 32px;
+  padding: 0 14px 0 10px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font: var(--fw-500) 13px/1 var(--font-ui);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 0 0 1px var(--hairline);
+}
+.drag-chip-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+/* A page's line icon (PageIcon), sized like the emoji it stands in for. */
+.page-glyph {
+  display: inline-block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+}
+.prose .callout-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: calc(1.625em + 6px);
+  font-size: 18px;
+  line-height: 1;
+  border-radius: var(--r-xs);
+  font-family: var(--font-ui);
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.prose .callout-icon:hover {
+  background: var(--fill-2);
+}
+.prose .callout-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Images */
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r-sm);
+  corner-shape: var(--corner);
+}
+.prose [data-resize-container] {
+  margin: 10px 0;
+}
+.prose [data-resize-handle] {
+  width: 16px;
+  display: grid;
+  place-items: center;
+  cursor: ew-resize;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+.prose [data-resize-handle]::after {
+  content: '';
+  width: 5px;
+  height: 40px;
+  max-height: 46%;
+  border-radius: 3px;
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 0.5px var(--hairline), var(--shadow-sm);
+}
+.prose [data-resize-container]:hover [data-resize-handle],
+.prose [data-resize-state='true'] [data-resize-handle] {
+  opacity: 1;
+}
+.prose .ProseMirror-selectednode img,
+.prose img.ProseMirror-selectednode {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+/* Tables: a single rounded frame with hairline cell rules. */
+.prose .tableWrapper {
+  margin: 8px 0;
+  overflow-x: auto;
+  padding: 0 0 6px;
+}
+.prose table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--separator-strong);
+  border-radius: var(--r-sm);
+  corner-shape: var(--corner);
+}
+.prose td,
+.prose th {
+  position: relative;
+  min-width: 80px;
+  padding: 7px 12px;
+  border: 0 solid var(--separator);
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  vertical-align: top;
+  text-align: left;
+  font-size: 0.9375em;
+}
+.prose tr > :last-child {
+  border-right-width: 0;
+}
+.prose tr:last-child > * {
+  border-bottom-width: 0;
+}
+.prose th {
+  font-weight: var(--fw-600);
+  background: var(--fill);
+  border-bottom-color: var(--separator-strong);
+}
+.prose tr:first-child > :first-child {
+  border-top-left-radius: calc(var(--r-sm) - 1px);
+}
+.prose tr:first-child > :last-child {
+  border-top-right-radius: calc(var(--r-sm) - 1px);
+}
+.prose td > p,
+.prose th > p {
+  padding: 0;
+}
+.prose .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--selection);
+  pointer-events: none;
+}
+.prose .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--text-3);
+  pointer-events: none;
+}
+.prose.resize-cursor {
+  cursor: col-resize;
+}
+
+/* Page links */
+.prose .page-link {
+  margin: 1px 0;
+}
+.prose .page-mention {
+  display: inline;
+}
+
+/* Placeholders */
+.prose .is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--text-4);
+  pointer-events: none;
+}
+/* A short hint in list items, and none in table cells (too narrow). */
+.prose li > p.is-empty::before,
+.prose li > div > p.is-empty::before {
+  content: 'List';
+}
+.prose :is(td, th) p.is-empty::before {
+  content: none;
+}
+
+/* A whole block selected (via the handle or arrow keys). */
+.prose .ProseMirror-selectednode:not(img):not([data-resize-container]):not(hr) {
+  border-radius: var(--r-xs);
+  background: var(--selection);
+  box-shadow: 0 0 0 3px var(--selection);
+}
+.prose hr.ProseMirror-selectednode::after {
+  background: var(--text);
+}
+
+/* Gap cursor (e.g. before a table) */
+.ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+}
+.ProseMirror-gapcursor::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1.5px solid var(--text);
+  animation: gap-blink 1.1s steps(2, start) infinite;
+}
+@keyframes gap-blink {
+  to {
+    visibility: hidden;
+  }
+}
+.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}
+
+/* Block handle */
+.block-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+.block-handle.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.block-handle.dragging {
+  opacity: 0;
+}
+.block-handle-btn {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 24px;
+  border-radius: var(--r-xs);
+  color: var(--text-4);
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.block-handle-btn:hover {
+  background: var(--fill);
+  color: var(--text-2);
+}
+.block-handle-btn.grip {
+  width: 18px;
+  cursor: grab;
+}
+.block-handle-btn.grip:active {
+  cursor: grabbing;
+}
+
+/* The "/" or "@" being typed while a suggestion menu is open. */
+.prose .suggestion {
+  background: var(--fill-2);
+  border-radius: 4px;
+  padding: 0 1px;
+}
+
+/* ------------------------------------------------------------------ printing */
+
+/* "Export as PDF" prints just the open page: no app chrome, light colours,
+   and blocks kept whole across page breaks. */
+@media print {
+  @page {
+    margin: 16mm 18mm;
+  }
+  html.printing,
+  html.printing body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  /* The page alone: the main pane of split view, without the side pane. */
+  html.printing .app,
+  html.printing .main,
+  html.printing .panes,
+  html.printing .scroller {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: none !important;
+  }
+  html.printing .app > :not(.main),
+  html.printing .main > :not(.panes),
+  html.printing .panes > :not(.scroller),
+  html.printing .toasts,
+  html.printing .tip,
+  html.printing .popover,
+  html.printing .block-handle,
+  html.printing .head-tools,
+  html.printing .backlinks,
+  html.printing .tail {
+    display: none !important;
+  }
+  html.printing .page {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  /* Hints like "Write something…" and an empty title's "Untitled". */
+  html.printing .prose .is-empty::before {
+    content: none !important;
+  }
+  html.printing ::placeholder {
+    color: transparent !important;
+  }
+  html.printing .page .head {
+    padding-top: 0 !important;
+  }
+  html.printing .prose :is(h1, h2, h3) {
+    break-after: avoid;
+  }
+  html.printing .prose :is(pre, table, img, blockquote, .callout, .flashcard, .file-block, li) {
+    break-inside: avoid;
+  }
+  html.printing * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ---------------------------------------------------------------- databases
+   Pills for choices, and the rows, fields and headings inside database
+   popovers (they match the menus). */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  max-width: 100%;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 5px;
+  font-size: var(--fs-footnote);
+  font-weight: var(--fw-500);
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: color-mix(in srgb, var(--pill, var(--c-gray)) 16%, transparent);
+  color: color-mix(in srgb, var(--pill, var(--c-gray)) 58%, var(--text));
+}
+:root[data-theme='dark'] .pill {
+  background: color-mix(in srgb, var(--pill, var(--c-gray)) 24%, transparent);
+  color: color-mix(in srgb, var(--pill, var(--c-gray)) 45%, var(--text));
+}
+/* Status: a rounded pill led by a dot. */
+.pill.status {
+  border-radius: 10px;
+  corner-shape: round;
+  padding-left: 6px;
+}
+.pill.status::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--pill, var(--c-gray));
+}
+.pill > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pop-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: var(--h-sm);
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-body-ui);
+  color: var(--text);
+  text-align: left;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.pop-item:hover:not(:disabled),
+.pop-item.active {
+  background: var(--fill-2);
+}
+.pop-item:disabled {
+  color: var(--text-4);
+}
+.pop-item > .icon {
+  flex: none;
+  color: var(--text-2);
+}
+.pop-item .grow {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pop-item .hint {
+  flex: none;
+  font-size: var(--fs-footnote);
+  color: var(--text-3);
+}
+.pop-item.danger,
+.pop-item.danger > .icon {
+  color: var(--danger);
+}
+.pop-sep {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--hairline);
+}
+.pop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 8px 4px;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-600);
+  letter-spacing: 0.01em;
+  color: var(--text-3);
+}
+.pop-input {
+  width: 100%;
+  height: var(--h-sm);
+  padding: 0 8px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--fill);
+  box-shadow: inset 0 0 0 0.5px var(--hairline);
+  font-size: var(--fs-body-ui);
+  color: var(--text);
+  outline: none;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.pop-input:focus {
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 1.5px var(--focus);
+}
+.pop-input::placeholder {
+  color: var(--text-3);
+}
+select.pop-input {
+  padding-right: 4px;
+}
+.pop-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--h-sm);
+  padding: 2px 8px;
+  font-size: var(--fs-body-ui);
+}
+.pop-row > .label {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-2);
+}
+
+/* A database inside a page: the app's own type, not the page's prose. */
+.prose .database-block {
+  margin: 12px 0 16px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-body-ui);
+  line-height: normal;
+  white-space: normal;
+  cursor: default;
+}
+.prose .database-block p {
+  margin: 0;
+  line-height: inherit;
+}
+.prose .database-block.ProseMirror-selectednode {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: var(--r-md);
+}

@@ -1,0 +1,58 @@
+{
+  "name": "grad-notes",
+  "private": true,
+  "version": "0.5.4",
+  "description": "Grad Notes is a local-first notes and study workspace for Linux, built with Rust, GTK 4 and libadwaita",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paullinux-gn/grad-notes.git"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "tauri": "tauri",
+    "app": "npm run app:gtk4",
+    "app:gtk4": "npm run build && cargo run --manifest-path gtk4/Cargo.toml",
+    "app:gtk4:dev": "cargo run --manifest-path gtk4/Cargo.toml -- --dev",
+    "bundle:gtk4": "npm run build && cargo build --release --manifest-path gtk4/Cargo.toml",
+    "bundle:flatpak": "./flatpak/build-local.sh",
+    "bundle": "npm run bundle:flatpak",
+    "bundle:linux": "npm run bundle:flatpak",
+    "app:tauri:experimental": "tauri dev",
+    "bundle:tauri:experimental": "tauri build --config src-tauri/tauri.linux.conf.json",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@tauri-apps/api": "^2.12.3",
+    "@tauri-apps/plugin-opener": "^2.7.1",
+    "@tauri-apps/plugin-process": "^2.4.0",
+    "@tauri-apps/plugin-updater": "^2.14.0",
+    "@tiptap/core": "^3.31.4",
+    "@tiptap/extension-bubble-menu": "^3.31.4",
+    "@tiptap/extension-details": "^3.31.4",
+    "@tiptap/extension-highlight": "^3.31.4",
+    "@tiptap/extension-image": "^3.31.4",
+    "@tiptap/extension-list": "^3.31.4",
+    "@tiptap/extension-table": "^3.31.4",
+    "@tiptap/extension-typography": "^3.31.4",
+    "@tiptap/extensions": "^3.31.4",
+    "@tiptap/pm": "^3.31.4",
+    "@tiptap/starter-kit": "^3.31.4",
+    "@tiptap/suggestion": "^3.31.4",
+    "katex": "^0.16.22"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@tauri-apps/cli": "^2.12.2",
+    "@tsconfig/svelte": "^5.0.8",
+    "svelte": "^5.57.2",
+    "svelte-check": "^4.7.6",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.4"
+  }
+}

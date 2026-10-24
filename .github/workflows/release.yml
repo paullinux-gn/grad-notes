@@ -1,0 +1,59 @@
+# Build a Linux Flatpak and attach it to a draft GitHub release.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  flatpak:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: gtk4
+
+      - name: Install Flatpak tools
+        run: sudo apt-get update && sudo apt-get install -y flatpak
+
+      - name: Install GNOME SDK and runtime
+        run: |
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user --noninteractive flathub org.gnome.Sdk//50 org.gnome.Platform//50
+
+      - run: npm ci
+
+      - name: Build Linux Flatpak
+        run: npm run bundle:flatpak
+
+      - name: Read app version
+        id: meta
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Attach Flatpak to a draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: false
+          name: Grad Notes ${{ github.ref_name }}
+          body: |
+            Grad Notes for Linux, using GTK 4 and libadwaita.
+
+            Install the `.flatpak` package with GNOME Software or with:
+
+            ```sh
+            flatpak install --user ./Grad-Notes-${{ steps.meta.outputs.version }}.flatpak
+            ```
+          files: artifacts/Grad-Notes-*.flatpak

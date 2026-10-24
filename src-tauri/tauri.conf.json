@@ -1,0 +1,59 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Grad Notes",
+  "version": "0.5.4",
+  "identifier": "io.github.paullinux_gn.gradnotes",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Grad Notes",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 720,
+        "minHeight": 480,
+        "center": true,
+        "decorations": false,
+        "shadow": true,
+        "visible": false,
+        "dragDropEnabled": false,
+        "additionalBrowserArgs": "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --force-gpu-mem-available-mb=160 --force-gpu-mem-discardable-limit-mb=32"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http://tdfile.localhost tdfile:; media-src 'self' blob: http://tdfile.localhost tdfile:; frame-src http://tdfile.localhost tdfile:; object-src 'none'; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost http://tdfile.localhost tdfile:",
+      "devCsp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "category": "Productivity",
+    "copyright": "Copyright (C) 2026 Kusule. Licensed under AGPL-3.0-or-later.",
+    "license": "AGPL-3.0-or-later",
+    "shortDescription": "A fast, local-first notes workspace",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ0MTUwQzM0MDIxNzgyQTgKUldTb2doY0NOQXdWUkQ5eURaZWdTUXhVdU55L1AzaFI0MnJuNkZQd2tGOWhQdTd4dXRSUjhQcCsK",
+      "endpoints": ["https://github.com/paullinux-gn/grad-notes/releases/latest/download/latest.json"],
+      "windows": { "installMode": "passive" }
+    }
+  }
+}

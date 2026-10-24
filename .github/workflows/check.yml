@@ -1,0 +1,73 @@
+# Checks and tests Grad Notes on Linux, its only supported platform.
+name: Check
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: gtk4
+
+      - name: Install GTK build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev libadwaita-1-dev libwebkitgtk-6.0-dev
+
+      - run: npm ci
+
+      - name: Type-check the interface
+        run: npm run check
+
+      - name: Build the interface
+        run: npm run build
+
+      - name: Check the Linux desktop app
+        run: cargo check --manifest-path gtk4/Cargo.toml
+
+      - name: Storage tests
+        run: cargo test
+        working-directory: gtk4/backend-core
+
+  # Drives the interface in Chromium against the fake backend (tests/e2e).
+  interface:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Get Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Interface tests
+        run: npm run e2e
+
+      # What failed, with a trace of every step: download it from the run's
+      # summary and open it with `npx playwright show-report`.
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: interface-test-report
+          path: playwright-report
+          retention-days: 14
