@@ -62,7 +62,7 @@ fn main() {
             );
             return;
         }
-        match serve_dist(&dist, &backend.db.files_dir) {
+        match serve_dist(&dist, &backend.db.files_dir, &backend.db.data_dir) {
             Ok(uri) => uri,
             Err(error) => {
                 eprintln!("Could not start Grad Notes' local content server: {error}");
@@ -948,9 +948,32 @@ fn prepare_native_bridge(manager: &UserContentManager, file_base: Option<&str>) 
     ));
 }
 
-fn serve_dist(root: &std::path::Path, files_root: &std::path::Path) -> io::Result<String> {
-    let listener = TcpListener::bind(("127.0.0.1", 0))?;
+fn serve_dist(
+    root: &std::path::Path,
+    files_root: &std::path::Path,
+    data_dir: &std::path::Path,
+) -> io::Result<String> {
+    // WebKit stores localStorage by origin, including the port number. A fresh
+    // ephemeral port on every launch therefore made the app look like a new
+    // install each time, even though its database was still present.
+    const PREFERRED_PORT: u16 = 38549;
+    let port_file = data_dir.join("webview-port");
+    let saved_port = std::fs::read_to_string(&port_file)
+        .ok()
+        .and_then(|value| value.trim().parse::<u16>().ok())
+        .filter(|port| *port != 0);
+    let listener = saved_port
+        .and_then(|port| TcpListener::bind(("127.0.0.1", port)).ok())
+        .or_else(|| TcpListener::bind(("127.0.0.1", PREFERRED_PORT)).ok())
+        .or_else(|| TcpListener::bind(("127.0.0.1", 0)).ok())
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::AddrInUse,
+                "could not bind the local app server",
+            )
+        })?;
     let address = listener.local_addr()?;
+    std::fs::write(&port_file, address.port().to_string())?;
     let root = root.to_path_buf();
     let files_root = files_root.to_path_buf();
     thread::spawn(move || {
