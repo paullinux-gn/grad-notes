@@ -666,6 +666,8 @@ fn append_sidebar_section(
             append_sidebar_item(&content, label, action, id, color, web_view, 0);
             if is_course_section {
                 if let Some(button) = content.last_child().and_downcast::<adw::gtk::Button>() {
+                    button.set_margin_top(3);
+                    button.set_margin_bottom(3);
                     if let Some(color) = color {
                         button.add_css_class(&course_color_class(color));
                     }
@@ -915,14 +917,16 @@ fn update_course_styles(provider: &adw::gtk::CssProvider, courses: &Value) {
             let g = (color.green() * 255.0).round() as u8;
             let b = (color.blue() * 255.0).round() as u8;
             let class = course_color_class(value);
-            let dark_r = (r as f32 * 0.18).round() as u8;
-            let dark_g = (g as f32 * 0.18).round() as u8;
-            let dark_b = (b as f32 * 0.18).round() as u8;
+            // Keep the label recognizably tinted with its course color while
+            // making it dark enough to read over the translucent fill.
+            let dark_r = (r as f32 * 0.45).round() as u8;
+            let dark_g = (g as f32 * 0.45).round() as u8;
+            let dark_b = (b as f32 * 0.45).round() as u8;
             let hover_r = (r as f32 * 0.78).round() as u8;
             let hover_g = (g as f32 * 0.78).round() as u8;
             let hover_b = (b as f32 * 0.78).round() as u8;
             css.push_str(&format!(
-                " button.flat.{class} {{ background-color: rgba({r},{g},{b},0.5); color: rgb({dark_r},{dark_g},{dark_b}); }} button.flat.{class}:hover {{ background-color: rgba({hover_r},{hover_g},{hover_b},0.68); }} button.flat.{class}.grad-notes-course-selected {{ background-color: rgb({r},{g},{b}); color: rgb({dark_r},{dark_g},{dark_b}); }}"
+                " button.flat.{class} {{ background-color: rgba({r}, {g}, {b}, 0.3); color: rgb({dark_r}, {dark_g}, {dark_b}); border-radius: 8px; }} button.flat.{class}:hover {{ background-color: rgba({hover_r}, {hover_g}, {hover_b}, 0.68); }} button.flat.{class}.grad-notes-course-selected {{ background-color: rgb({r}, {g}, {b}); color: rgb({dark_r}, {dark_g}, {dark_b}); }}"
             ));
         }
     }
