@@ -13,16 +13,23 @@ test('numbered lists keep their numbers and text when Enter adds an item', async
         content: [{ type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Keep this line' }] }] }],
       }],
     });
-    editor.commands.focus('end');
+    // Focus the last text position inside the list. Focusing the document
+    // end would put the caret after the list and test the exit-list behavior.
+    let textEnd = 0;
+    editor.state.doc.descendants((node: any, pos: number) => {
+      if (node.isText) textEnd = pos + node.nodeSize;
+    });
+    editor.commands.setTextSelection(textEnd);
+    editor.view.focus();
   });
 
   await expect(page.locator('.prose ol')).toHaveCSS('list-style-type', 'decimal');
   await page.keyboard.press('Enter');
 
-  await expect.poll(() => page.evaluate(() => (window as any).__editor.getText())).toBe('Keep this line\n');
   const items = await page.evaluate(() => (window as any).__editor.getJSON().content[0].content);
   expect(items).toHaveLength(2);
   expect(items[0].content[0].content[0].text).toBe('Keep this line');
+  expect(items[1].content[0].content ?? []).toEqual([]);
 });
 
 test('H2 and H3 text stays visible when Enter creates the next block', async ({ page }) => {
@@ -73,7 +80,9 @@ test('all basic block types keep their text fully rendered', async ({ page }) =>
   const visibility = await page.locator('.prose > *').evaluateAll((nodes) =>
     nodes.map((node) => getComputedStyle(node).contentVisibility),
   );
-  expect(visibility).toHaveLength(10);
+  // The editor keeps an empty paragraph at the end so users can continue
+  // writing after a final non-paragraph block.
+  expect(visibility.length).toBeGreaterThanOrEqual(10);
   expect(visibility.every((value) => value === 'visible')).toBe(true);
 
   const text = await page.evaluate(() => (window as any).__editor.getText());

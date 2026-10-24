@@ -126,11 +126,14 @@ test.describe('with reduced motion', () => {
 });
 
 test('GTK host keeps app views and settings free of motion', async ({ page }) => {
-  await page.addInitScript(() => {
+  await open(page);
+  // The browser test still needs the in-memory backend. Apply the GTK class
+  // after startup so the test can exercise native-host styling without
+  // disabling the browser stand-in for Rust commands.
+  await page.evaluate(() => {
     (window as any).__GRAD_NOTES_GTK_HOST__ = true;
     document.documentElement.classList.add('grad-notes-gtk');
   });
-  await open(page);
   await page.keyboard.press('Control+2');
   await page.keyboard.press('Control+Comma');
   await expect(page.locator('.modal')).toBeVisible();
